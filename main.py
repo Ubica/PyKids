@@ -1,6 +1,7 @@
 from tkinter import Canvas, Tk, font
 
 import simpleaudio as sa
+from sounds import Sounds
 
 
 def width(canvas):
@@ -24,24 +25,30 @@ def main():
     canvas.pack(fill='both', expand='yes')
 
     x, y = getCenter(canvas)
-    global c, playing
+    global c, playing, sounds
+    sounds = Sounds()
     playing = None
     c = canvas.create_text(x, y, text='')
 
     def key(event):
-        global c, playing
-        key = event.char
-        canvas.delete(c)
-        x, y = getCenter(canvas)
-        c = canvas.create_text(x, y, text=key.upper(), font=getFont(canvas))
-        if key == 'a':
-            if not playing:
-                audio_data = open('a.wav', 'rb').read()
-                playing = sa.play_buffer(audio_data, 2, 2, 44100)
-        if key == 'b':
-            if playing and playing.is_playing():
-                playing.stop()
-            playing = None
+        global c, playing, sounds
+        key = event.char.lower()
+        if key in 'abcdefghijklmnopqrstuvwxyz':
+            canvas.delete(c)
+            x, y = getCenter(canvas)
+            c = canvas.create_text(x, y, text=key.upper(), font=getFont(canvas))
+            if not playing or not playing.is_playing():
+                letter = sounds.getRandomSound(key)
+                word = sounds.getRandomWord(key)
+                audio_data = None
+                if letter and word:
+                    audio_data = letter + word
+                elif letter:
+                    audio_data = letter
+                elif word:
+                    audio_data = word
+                if audio_data:
+                    playing = sa.play_buffer(audio_data, 1, 2, 44100)
 
     master.bind('<Key>', key)
 
