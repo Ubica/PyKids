@@ -33,22 +33,21 @@ def main():
     def key(event):
         global c, playing, sounds
         key = event.char.lower()
-        if key in 'abcdefghijklmnopqrstuvwxyz':
+        if key in 'abcdefghijklmnopqrstuvwxyz123456789' and (not playing or not playing.is_playing()):
             canvas.delete(c)
             x, y = getCenter(canvas)
             c = canvas.create_text(x, y, text=key.upper(), font=getFont(canvas))
-            if not playing or not playing.is_playing():
-                letter = sounds.getRandomSound(key)
-                word = sounds.getRandomWord(key)
-                audio_data = None
-                if letter and word:
-                    audio_data = letter + word
-                elif letter:
-                    audio_data = letter
-                elif word:
-                    audio_data = word
-                if audio_data:
-                    playing = sa.play_buffer(audio_data, 1, 2, 44100)
+            letter = sounds.getRandomSound(key)
+            word = sounds.getRandomWord(key)
+            audio_data = None
+            if letter and word:
+                audio_data = letter + word
+            elif letter:
+                audio_data = letter
+            elif word:
+                audio_data = word
+            if audio_data:
+                playing = sa.play_buffer(audio_data, 1, 2, 44100)
 
     master.bind('<Key>', key)
 
