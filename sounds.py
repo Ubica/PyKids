@@ -1,10 +1,15 @@
 import os
 import random
+
+from pydub import AudioSegment
 from simpleaudio import WaveObject
+
+PYDUB = 'pydub'
+SIMPLEAUDIO = 'simpleaudio'
 
 
 class Sounds():
-    def __init__(self):
+    def __init__(self, audio_library):
         self.sounds = {}
         folder = 'sounds'
         language = 'srb'
@@ -24,16 +29,27 @@ class Sounds():
                         self.sounds[letter] = {}
                     if t not in self.sounds[letter]:
                         self.sounds[letter][t] = []
-                    zvukData = open(filepath, 'rb').read()
-                    zvukObject = WaveObject(zvukData, num_channels=1, bytes_per_sample=2, sample_rate=44100)
-                    self.sounds[letter][t].append(zvukObject)
 
-    def getRandomSound(self, letter):
+                    if audio_library == PYDUB:
+                        sound_object = AudioSegment.from_file(filepath, format="wav")
+                    elif audio_library == SIMPLEAUDIO:
+                        sound_object = WaveObject(
+                            open(filepath, 'rb').read(),
+                            num_channels=1,
+                            bytes_per_sample=2,
+                            sample_rate=44100
+                        )
+                    else:
+                        raise Exception('audio_library not configured')
+
+                    self.sounds[letter][t].append(sound_object)
+
+    def get_random_sound(self, letter):
         if letter in self.sounds and 'letter' in self.sounds[letter]:
             index = random.randint(0, len(self.sounds[letter]['letter']) - 1)
             return self.sounds[letter]['letter'][index]
 
-    def getRandomWord(self, letter):
+    def get_random_word(self, letter):
         if letter in self.sounds and 'words' in self.sounds[letter]:
             index = random.randint(0, len(self.sounds[letter]['words']) - 1)
             return self.sounds[letter]['words'][index]

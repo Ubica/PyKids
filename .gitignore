@@ -91,3 +91,6 @@ ENV/
 # Eclipse project
 .project
 .pydevproject
+
+# PyCharm
+.idea/
